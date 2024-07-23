@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Hp : MonoBehaviour
 {
-    //눈빛 보내기 ㅎ Hp를 Ramdom.Range를 이용해서 무작위로 하고, 이 스크립트를 그냥 인간에게 넣어서 하는거 어때 
-    //시간 만들어서 끝나는거 만들기.
 
     public int hp;              //인간의 HP
     private int Attack = 5;     //내 공격력
@@ -16,6 +15,7 @@ public class Hp : MonoBehaviour
     private float time = 120;   //게임 시간
     public TMP_Text text;       //시간 넣을 텍스트
 
+    //한 명이라도 못 꼬시면 게임이 끝나버리는 눈빛 보내기 게임 ㅎ
     void Start()
     {
         hp = Random.Range(10, 40);      //인간의 생명은 다양하지롱
@@ -43,7 +43,7 @@ public class Hp : MonoBehaviour
 
             if (Input.GetMouseButton(0))
             {
-                hp -= Attack;                   //마우스 좌클릭으로 계속해서 때려때렷!!!!
+                hp -= Attack;                   //마우스 좌클릭으로 계속해서 때려!!!!
             }
 
             if (hp <= 0)
@@ -53,26 +53,38 @@ public class Hp : MonoBehaviour
                 Debug.Log("너는 나에게 넘어왔지 모얌!");       //크크 넌 나에게 넘어왔닷!
             }
 
-            //switch(hp)        이거 한 번만 실행하게 하고싶당....
-            //{
-            //    case 10:
-            //        Debug.Log("내가.. 넘어갈듯 하냐!!");
-            //        break;
-            //    case 20:
-            //        Debug.Log("안 넘어간다고!");
-            //        hp += 5;
-            //        break;
-            //    case 30:
-            //        Debug.Log("크크 난 피가 계속 찬다고..!!");
-            //        break;
+            /*switch(hp)      
+            {
+                case 10:
+                    Debug.Log("내가.. 넘어갈듯 하냐!!");
+                    break;
+                case 20:
+                    Debug.Log("안 넘어간다고!");
+                    hp += 5;
+                    break;
+                case 30:
+                    Debug.Log("크크 난 피가 계속 찬다고..!!");
+                    break;
+                case 40:
+                    Debug.Log("제대로 하고 있는거야?");
+                    break;
+                case 50:
+                    Debug.Log("어렵구나 너?");
+                    break;
+                case 60:
+                    Debug.Log("하하 뭐하자는거지?");
+                    break;
 
-            //}
+            }
+            */
         }
 
-        if (time == 0)              //시간 초과~!
+        if (time <= 0)              //시간 초과~!
         {
+            time = 0;
             gamestart = false;      //게임 꺼.
         }
+
         if(gamestart == false)
         {
             if (Input.GetKeyDown(KeyCode.Space))        //스페이스바를 누르면
