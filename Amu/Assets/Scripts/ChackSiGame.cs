@@ -26,16 +26,17 @@ public class ChackSiGame : MonoBehaviour
         velocity *= speed;
         characterRigidbody.velocity = velocity;
 
-        if (other)
-        {
-            float dist = Vector3.Distance(other.position, transform.position);
-            Debug.Log("Distance to other: " + dist);
-            other.localScale = new Vector3(dist * 0.4f, dist * 0.4f, dist * 0.4f); 
-        }
+        
 
         if(Input.GetMouseButtonDown(0))
         {
 
+            if (other)
+            {
+                float dist = Vector3.Distance(other.position, transform.position);
+                Debug.Log("Distance to other: " + dist);
+                other.localScale = new Vector3(dist * 0.4f, dist * 0.4f, dist * 0.4f);
+            }
         }
     }
 }
