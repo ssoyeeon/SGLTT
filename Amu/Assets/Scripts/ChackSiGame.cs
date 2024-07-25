@@ -1,3 +1,4 @@
+using Microsoft.Win32.SafeHandles;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,9 +12,10 @@ public class ChackSiGame : MonoBehaviour
     public Transform other;                                     //일단 아이 하나를 잡아왔어요
     public float speed = 20f;
     private Rigidbody characterRigidbody;
-    public Transform Parent;                                   //부모도 같이 납치했어요!
 
-    private bool isHold;                                        //아이를 잡고 있나요?
+    public Camera camera;
+    public float distance = 10f;
+
 
     void Start()
     {
@@ -29,36 +31,34 @@ public class ChackSiGame : MonoBehaviour
         velocity *= speed;
         characterRigidbody.velocity = velocity;
 
-        
-
-        if(Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
         {
+
+            RaycastHit hit;
+            Vector3 mouseScreenPosition = Input.mousePosition;
+            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.collider.tag == "Cube")
+                {
+                    GameObject objectHit = hit.collider.gameObject;
+                    mouseScreenPosition.z = distance;
+                    objectHit.transform.position = camera.ScreenToWorldPoint(mouseScreenPosition);
+                }
+            }
 
             if (other)
             {
                 float dist = Vector3.Distance(other.position, transform.position);          //거리를 구해요
-                Debug.Log("Distance to other: " + dist);
+                //Debug.Log("Distance to other: " + dist);
                 other.localScale = new Vector3(dist * 0.4f, dist * 0.4f, dist * 0.4f);      //거리에 따라 스케일 값을 변경해요
 
-                /*other.transform.parent = Parent.transform;                                  //너 내 부모가 돼라!!*/
-
-                isHold = true;                                                              //잡고 있어요!
-
-                if (Input.GetMouseButton(0))                                            //한 번 더 누르면 
+                if (Input.GetKey(KeyCode.E))
                 {
-                    isHold = false;                                                         //불 값이 풀려요
-                   /* other.transform.parent = null;                                          //아이의 부모가 사라졌어요 */
+                    other.transform.Rotate(0f, -Input.GetAxis("Mouse X") * speed, 0f, Space.World);
+                    other.transform.Rotate(-Input.GetAxis("Mouse Y") * speed, 0f, 0f);
                 }
-
-                other.Translate(0f, -Input.GetAxis("Mouse X") * 1.2f, 0f, Space.World);        //이상해!! 이상해!! 이거 왜 이래!!
-                other.Translate(-Input.GetAxis("Mouse Y") * 1.2f, 0f, 0f);                     //살려주시와요.. 마우스로 가까이, 좌,우 를 옮기고 싶었어요...
-
-            }
-
-            if(Input.GetKey(KeyCode.E))
-            {
-                other.transform.Rotate(0f, -Input.GetAxis("Mouse X") * speed, 0f, Space.World);
-                other.transform.Rotate(-Input.GetAxis("Mouse Y") * speed, 0f, 0f);
             }
         }
     }
