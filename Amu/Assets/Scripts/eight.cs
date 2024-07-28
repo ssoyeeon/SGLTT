@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class eight : MonoBehaviour
 {
@@ -11,24 +12,37 @@ public class eight : MonoBehaviour
     //4,6,7,9에만 게임 오브젝트를 두고 그 게임 오브젝트가 있다면 없다면으로 체크해서 하는건?
 
     public bool isTrue;     //제대로 갔나염?
-    public int scene = Random.Range(0, 10);
-    public int exit = 0;
+
+    public int scene = Random.Range(0, 10);     //씬 랜덤
+
+    public int exit = 0;                        //출구
+    public TMP_Text dayText;                    //출구 나오는 채팅
+
+    public GameObject bed;                      //침대 (잠)
+    public GameObject door;                     //문   (밖으로 나감)
+
+    void Start()
+    {
+
+    }
 
     void Update()
     {
         if(isTrue == true)                      //맞췄을 때
         {
             exit++;                             //출구 번호 +1
+            dayText.text = exit.ToString(exit + "Days");
         }
 
         else if ( isTrue == false)              //틀렸을 때
         {
             exit = 0;                           //출구 번호 0번. (초기화)
+            dayText.text = exit.ToString(exit + "Days");
         }
 
         if(isTrue)                              //일단 어디든 갔을 때
         {
-            SceneManager.LoadScene(scene);      //랜덤 0~10 씬 출력
+           SceneManager.LoadScene(scene);      //랜덤 0~10 씬 출력
         }
 
         Scene nowscene = SceneManager.GetActiveScene();     //현재 씬을 가져오고
