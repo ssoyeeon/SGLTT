@@ -12,7 +12,7 @@ public class Hp : MonoBehaviour
 
     public bool gamestart;      //시작 했는지 안 했는지 bool 값으로 확인
 
-    private float time = 120;   //게임 시간
+    public float time = 120;   //게임 시간
     public TMP_Text text;       //시간 넣을 텍스트
 
     //한 명이라도 못 꼬시면 게임이 끝나버리는 눈빛 보내기 게임 ㅎ
