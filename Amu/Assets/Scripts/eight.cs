@@ -13,7 +13,7 @@ public class eight : MonoBehaviour
 
     public bool isTrue;     //Á¦´ë·Î °¬³ª¿°?
 
-    public int scene = Random.Range(0, 10);     //¾À ·£´ý
+    public int scene;   //¾À ·£´ý
 
     public int exit = 0;                        //Ãâ±¸
     public TMP_Text dayText;                    //Ãâ±¸ ³ª¿À´Â Ã¤ÆÃ
@@ -23,7 +23,7 @@ public class eight : MonoBehaviour
 
     void Start()
     {
-
+        scene = Random.Range(0, 10);
     }
 
     void Update()
