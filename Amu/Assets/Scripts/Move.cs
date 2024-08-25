@@ -12,6 +12,6 @@ public class Move : MonoBehaviour
 
         Vector3 moveDir = gameObject.transform.forward * vertical + gameObject.transform.right * horizontal;
 
-        gameObject.transform.Translate(moveDir.normalized * 20 * Time.deltaTime, Space.World);
+        gameObject.transform.Translate(moveDir.normalized * 10 * Time.deltaTime, Space.World);
     }
 }
