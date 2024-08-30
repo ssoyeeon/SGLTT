@@ -9,6 +9,11 @@ public class ChackSiGame : MonoBehaviour
     //int layerMask = 1 << LayerMask.NameToLayer("Player");  // Player 레이어만 충돌 체크함
     //Physics.Raycast(transform.position, transform.TransformDirection (Vector3.forward), hit, Mathf.Infinity, layerMask);
 
+    //특정 layer만 raycast제외하기 (1)
+    //int layerMask = (-1) - (1 << LayerMask.NameToLayer("Player"));  // Everything에서 Player 레이어만 제외하고 충돌 체크함
+    //Physics.Raycast(transform.position, transform.TransformDirection (Vector3.forward), hit, Mathf.Infinity, layerMask);
+
+
     //게임 오브젝트를 이리저리 돌릴 수도 있음 마우스 회전을 통해서
     //이리 저리 돌리고 놓은 물체 저장
     //만질 수 있는 모든 오브젝트를 거리 구해야하자나...? 계속해서...
