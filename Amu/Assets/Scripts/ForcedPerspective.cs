@@ -18,8 +18,8 @@ public class ForcedPerspective : MonoBehaviour
         // 왼쪽 마우스 버튼을 클릭했을 때
         if (Input.GetMouseButtonDown(0))
         {
-            if (grabbedObject == null)
-            {
+            if (grabbedObject == null )
+            {              
                 GrabObject();  // 물체를 잡음
             }
             else
@@ -44,10 +44,13 @@ public class ForcedPerspective : MonoBehaviour
         // 레이캐스트로 물체 감지
         if (Physics.Raycast(ray, out hit, grabDistance))
         {
-            grabbedObject = hit.collider.gameObject;
-            originalScale = grabbedObject.transform.localScale;
-            originalDistance = Vector3.Distance(mainCamera.transform.position, grabbedObject.transform.position);
-            placeDistance = Mathf.Min(hit.distance, placeDistance); // 초기 거리 설정
+            if(hit.collider.gameObject.tag == "Unreal")
+            {
+                grabbedObject = hit.collider.gameObject;
+                originalScale = grabbedObject.transform.localScale;
+                originalDistance = Vector3.Distance(mainCamera.transform.position, grabbedObject.transform.position);
+                placeDistance = Mathf.Min(hit.distance, placeDistance); // 초기 거리 설정
+            }           
         }
     }
 
@@ -61,23 +64,27 @@ public class ForcedPerspective : MonoBehaviour
         float currentDistance = Vector3.Distance(mainCamera.transform.position, newPosition);
         float scaleFactor = currentDistance / originalDistance;
         grabbedObject.transform.localScale = originalScale * scaleFactor;
+
+        grabbedObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
     }
 
     void AdjustObjectDistance()
     {
-        float scrollInput = Input.GetAxis("Mouse ScrollWheel");
-        if (scrollInput != 0)
-        {
-            // 마우스 휠 입력에 따라 거리 조절
-            placeDistance -= scrollInput * zoomSpeed;
-            // 거리를 최소값과 최대값 사이로 제한
-            placeDistance = Mathf.Clamp(placeDistance, minDistance, maxDistance);
-        }
+            float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+            if (scrollInput != 0)
+            {
+                // 마우스 휠 입력에 따라 거리 조절
+                placeDistance -= scrollInput * zoomSpeed;
+                // 거리를 최소값과 최대값 사이로 제한
+                placeDistance = Mathf.Clamp(placeDistance, minDistance, maxDistance);
+            }
     }
 
     void PlaceObject()
     {
         // 물체를 놓음 (잡고 있는 물체 참조 제거)
+        grabbedObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
         grabbedObject = null;
+       
     }
 }
