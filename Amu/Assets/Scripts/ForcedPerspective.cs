@@ -2,12 +2,15 @@ using UnityEngine;
 
 public class ForcedPerspective : MonoBehaviour
 {
-    public Camera mainCamera;      // 메인 카메라 참조
+    public Camera mainCamera;          // 메인 카메라 참조
     public float grabDistance = 100f;  // 물체를 잡을 수 있는 최대 거리
     public float placeDistance = 10f;  // 물체를 놓을 기본 거리
     public float zoomSpeed = 1f;       // 줌 속도 (마우스 휠 감도)
     public float minDistance = 1f;     // 물체를 가져올 수 있는 최소 거리
     public float maxDistance = 20f;    // 물체를 보낼 수 있는 최대 거리
+    public float force = 10f;          // 물체를 보낼 힘
+    public bool isGrab = false;        // 물체를 잡고있는지
+    public Rigidbody rig;              //물체에 힘을 줄 리지드바디
 
     private GameObject grabbedObject;  // 현재 잡고 있는 물체
     private Vector3 originalScale;     // 물체의 원래 크기
@@ -18,13 +21,15 @@ public class ForcedPerspective : MonoBehaviour
         // 왼쪽 마우스 버튼을 클릭했을 때
         if (Input.GetMouseButtonDown(0))
         {
-            if (grabbedObject == null )
+            if ( grabbedObject == null )
             {              
                 GrabObject();  // 물체를 잡음
+                isGrab = true;
             }
             else
             {
                 PlaceObject(); // 물체를 놓음
+                isGrab = false;
             }
         }
 
@@ -33,6 +38,7 @@ public class ForcedPerspective : MonoBehaviour
         {
             UpdateObjectPosition();  // 물체 위치 업데이트
             AdjustObjectDistance();  // 물체 거리 조절
+            isGrab = true;
         }
     }
 
@@ -85,6 +91,6 @@ public class ForcedPerspective : MonoBehaviour
         // 물체를 놓음 (잡고 있는 물체 참조 제거)
         grabbedObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
         grabbedObject = null;
-       
+
     }
 }
