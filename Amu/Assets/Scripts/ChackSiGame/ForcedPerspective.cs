@@ -10,7 +10,8 @@ public class ForcedPerspective : MonoBehaviour
     public float maxDistance = 20f;    // 물체를 보낼 수 있는 최대 거리
     public float force = 10f;          // 물체를 보낼 힘
     public bool isGrab = false;        // 물체를 잡고있는지
-    public Rigidbody rig;              //물체에 힘을 줄 리지드바디
+    public Rigidbody rig;              // 물체에 힘을 줄 리지드바디
+    public float speed = 20f;          // 물체 돌려야징
 
     private GameObject grabbedObject;  // 현재 잡고 있는 물체
     private Vector3 originalScale;     // 물체의 원래 크기
@@ -71,7 +72,12 @@ public class ForcedPerspective : MonoBehaviour
         float scaleFactor = currentDistance / originalDistance;
         grabbedObject.transform.localScale = originalScale * scaleFactor;
 
-        grabbedObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        // 물체 회전
+        if (Input.GetKey(KeyCode.E))        
+        {
+            grabbedObject.transform.Rotate(0f, -Input.GetAxis("Mouse X") * speed, 0f, Space.World);
+            grabbedObject.transform.Rotate(-Input.GetAxis("Mouse Y") * speed, 0f, 0f);              
+        }
     }
 
     void AdjustObjectDistance()
