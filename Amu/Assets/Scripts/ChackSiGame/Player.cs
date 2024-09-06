@@ -1,66 +1,67 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float force = 10.0f;
-    public Rigidbody rig;
-    public bool isJumping;
-    public float jumpTime;
+    public float mouseSensitivity = 2f;
+    public float moveSpeed = 5f;
+    public Texture2D cursorTexture; // Inspector에서 커서 이미지를 할당해야 합니다.
+    private float verticalRotation = 0f;
+    private CharacterController controller;
+    private Camera playerCamera;
 
-     void Start()
+    void Start()
     {
-        rig = GetComponent<Rigidbody>();
-        isJumping = false;
-        jumpTime = 2f;
+        controller = GetComponent<CharacterController>();
+        playerCamera = Camera.main;
+        if (playerCamera != null)
+        {
+            playerCamera.transform.localRotation = Quaternion.identity;
+        }
+        // 플레이어의 초기 회전 설정
+        transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
+
+        // 커서를 숨기고 중앙에 고정
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
+
     void Update()
     {
-        Move(); Jump();
+        HandleRotation();
+        HandleMovement();
     }
 
-    public void Move()
+    void OnGUI()
     {
-        /*if (Input.GetKey(KeyCode.W))
-            //this.transform.Translate(new Vector3(0, 0, 3));
-           // rig.AddForce(0, 0, 100);
-        if (Input.GetKey(KeyCode.A))
-        // rig.AddForce(-100, 0, 0);
-        //this.transform.Translate(new Vector3(-3, 0, 0));
-        if (Input.GetKey(KeyCode.S))
-            //rig.AddForce(0, 0, -100);
-       // this.transform.Translate(new Vector3(0, 0, -3));
-        if (Input.GetKey(KeyCode.D))
-        //rig.AddForce(100, 0, 0);
-        this.transform.Translate(new Vector3(3, 0, 0)); */
-
-        float Horizontal = Input.GetAxis("Horizontal");
-        float Vertical = Input.GetAxis("Vertical");
-
-        transform.position += new Vector3(Horizontal, 0, Vertical) * force * Time.deltaTime;
-       // Vector3 move = new Vector3(Horizontal, 0, Vertical);
-       // rig.AddForce(move * force);
-    }
-
-    public void Jump()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
+        // 화면 중앙에 커스텀 커서 그리기
+        if (cursorTexture != null)
         {
-            if(isJumping == false) 
-            {
-                rig.AddForce(0, 200, 0);
-                isJumping =true;
-            }
+            float xPos = Screen.width / 2 - cursorTexture.width / 2;
+            float yPos = Screen.height / 2 - cursorTexture.height / 2;
+            GUI.DrawTexture(new Rect(xPos, yPos, cursorTexture.width, cursorTexture.height), cursorTexture);
         }
-        if(isJumping==true)
-        { jumpTime -= Time.deltaTime;
-            if (jumpTime <= 0)
-            {
-                jumpTime = 2;
-                isJumping = false;
-            }
-        }
+    }
+
+    void HandleRotation()
+    {
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+        // 플레이어의 좌우 회전
+        transform.Rotate(Vector3.up * mouseX);
+
+        // 카메라의 상하 회전
+        verticalRotation -= mouseY;
+        verticalRotation = Mathf.Clamp(verticalRotation, -90f, 90f);
+        playerCamera.transform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
+    }
+
+    void HandleMovement()
+    {
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        float moveVertical = Input.GetAxis("Vertical");
+
+        Vector3 movement = transform.right * moveHorizontal + transform.forward * moveVertical;
+        controller.Move(movement * moveSpeed * Time.deltaTime);
     }
 }
