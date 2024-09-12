@@ -2,11 +2,13 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    //Help!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 살려주세요 이거 뭐에요 교수님 살려주세요!!!!
+    //허준교수님 최고 ^.^ 제가 쓴 코드는... 모두 지워졌어요............................ㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠ
     [Header("Movement Settings")]
     public float moveSpeed = 5f;                // 플레이어의 이동 속도
     public float mouseSensitivity = 2f;         // 마우스 감도 (시점 회전 속도)
-    public float jumpForce = 5f;                // 점프할 때 적용되는 힘
-    public float gravity = -9.81f;              // 중력 가속도 값
+    public float jumpForce = 1.5f;              // 점프할 때 적용되는 힘
+    public float gravity = -12f;              // 중력 가속도 값
 
     [Header("Interaction Settings")]
     public float pickupRange = 10f;             // 물체를 집을 수 있는 최대 거리
@@ -138,7 +140,7 @@ public class PlayerController : MonoBehaviour
         // 점프 처리
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            velocity.y = Mathf.Sqrt(jumpForce * -2f * gravity);
+            velocity.y = Mathf.Sqrt(jumpForce * -1f * gravity);     //왜 jumpForce에 힘을 5줘도 짱 많이 뛰고 3 줘도 1 줘도 0.1 줘도 똑같이 짱 많이 뛰는걸까요?
         }
 
         velocity.y += gravity * Time.deltaTime;
