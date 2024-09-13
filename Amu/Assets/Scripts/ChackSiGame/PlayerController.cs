@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    //Help!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 살려주세요 이거 뭐에요 교수님 살려주세요!!!!
-    //허준교수님 최고 ^.^ 제가 쓴 코드는... 모두 지워졌어요............................ㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠㅠ
+    //잡기 전엔 rig false 시켜놓기
     [Header("Movement Settings")]
     public float moveSpeed = 5f;                // 플레이어의 이동 속도
     public float mouseSensitivity = 2f;         // 마우스 감도 (시점 회전 속도)
@@ -140,7 +139,7 @@ public class PlayerController : MonoBehaviour
         // 점프 처리
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            velocity.y = Mathf.Sqrt(jumpForce * -1f * gravity);     //왜 jumpForce에 힘을 5줘도 짱 많이 뛰고 3 줘도 1 줘도 0.1 줘도 똑같이 짱 많이 뛰는걸까요?
+            velocity.y = Mathf.Sqrt(jumpForce * -1f * gravity);
         }
 
         velocity.y += gravity * Time.deltaTime;
