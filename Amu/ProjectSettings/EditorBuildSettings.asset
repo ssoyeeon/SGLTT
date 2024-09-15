@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Chacksi/GameScene/Stage1.unity
+    guid: d8ad3b20b65b12e44a809759087baff5
+  - enabled: 1
+    path: Assets/Scenes/Chacksi/GameScene/Stage2.unity
+    guid: b00ad3f3feae21a4ca5bed8849226573
   m_configObjects: {}

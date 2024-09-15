@@ -136,10 +136,10 @@ public class PlayerController : MonoBehaviour
         Vector3 move = transform.right * x + transform.forward * z;
         controller.Move(move * moveSpeed * Time.deltaTime);
 
-        // 점프 처리
+        // 점프 처리 이거 그냥 Rigbody에 주면 안되는걸까여..??
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            velocity.y = Mathf.Sqrt(jumpForce * -1f * gravity);
+            velocity.y = Mathf.Sqrt(jumpForce * -1f * gravity);     //중력을 거슬러 올라갓 ! jumpforce * -1 * gravity 제곱만큼. AddForce는 방향에 맞게 힘을 주는 것.
         }
 
         velocity.y += gravity * Time.deltaTime;
