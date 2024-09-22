@@ -192,6 +192,7 @@ public class PlayerController : MonoBehaviour
             heldRigidbody = heldObject.GetComponent<Rigidbody>();
             heldCollider = heldObject.GetComponent<Collider>();
 
+            //물체를 한 번 집으면, 그 물체는 리지드바디가 활성화. 그 전에는 비활성화 그니까? 아잇 몰라잇 아으 ! 
             if (heldRigidbody != null)
             {
                 heldRigidbody.isKinematic = true;
