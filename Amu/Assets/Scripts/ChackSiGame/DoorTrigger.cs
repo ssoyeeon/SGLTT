@@ -4,15 +4,14 @@ using UnityEngine;
 
 public class DoorTrigger : MonoBehaviour
 {
-    private Collider doorcollider;
+    public Collider doorCollider;
+    public GameObject doorKey;
 
     public void OnCollisionEnter(Collision collision)
     {
-        if (gameObject.CompareTag("DoorTrigger"))
+        if (doorKey)
         {
-            Debug.Log("¾Æ µÆ´Ù°í!!");
-            doorcollider.enabled = false;
+            doorCollider.enabled = false;
         }
-
     }
 }
