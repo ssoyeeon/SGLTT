@@ -163,9 +163,10 @@ public class PlayerController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             if (heldObject == null)
-                PickupObject();
+            PickupObject();       //..§– æÓ∂±«œ¡“?
+
             else
-                PlaceObject();
+            PlaceObject();
         }
 
         if (heldObject != null)
