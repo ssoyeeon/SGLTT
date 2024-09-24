@@ -9,27 +9,47 @@ public class DoorTrigger : MonoBehaviour
 
     public bool isStay = false;
 
-     //public void OnCollisionEnter(Collision collision)
-     //{
-     //    if (doorKey)
-     //    {
-     //        doorCollider.enabled = false;
-     //    }
-     //}
-     public void OnCollisionExit(Collision collision)
-     {
-        isStay = false; if (doorKey && isStay == false)
-        {
-            doorCollider.GetComponent<Collider>().enabled = true;
-        }
-    }
-    public void OnCollisionStay(Collision collision)
+    //public void OnCollisionEnter(Collision collision)
+    //{
+    //    if (doorKey)
+    //    {
+    //        doorCollider.enabled = false;
+    //    }
+    //}
+
+    public void OnTriggerEnter(Collider other)
     {
-        isStay = true; if (doorKey && isStay == true)
-        {
-            doorCollider.enabled = false;
+        if (doorKey)
+       {
+           doorCollider.enabled = false;
+            Debug.Log(other.gameObject.name + "Å¸´Ù");
         }
     }
+    public void OnTriggerExit(Collider other)
+    {
+        if (doorKey)
+        {
+            doorCollider.enabled = true;
+            Debug.Log(other.gameObject.name + "Â¥ÀÜ");
+        }
+    }
+    //public void OnCollisionEnter(Collision collision)
+    //{
+    //    if (doorKey)
+    //   {
+    //       doorCollider.enabled = false;
+    //        Debug.Log(collision.gameObject.name + "Å¸´Ù");
+    //    }
+    //}
+
+    //public void OnCollisionExit(Collision collision)
+    //{
+    //    if (doorKey)
+    //    {
+    //        doorCollider.enabled = true;
+    //        Debug.Log(collision.gameObject.name + "Â¥ÀÜ");
+    //    }
+    //}
 
     //void Update()
     //{
