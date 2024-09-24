@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Distance Settings")]
     public float minDistance = 1f;              // 플레이어와 물체 사이의 최소 거리
+    private float maxDistance = 25f;              // 플레이어와 물체 사이의 최대 거리
 
     [Header("Smoothing Settings")]
     public float smoothSpeed = 10f;             // 물체 이동 및 크기 변경의 부드러움 정도
@@ -66,6 +67,8 @@ public class PlayerController : MonoBehaviour
     [Header("Object Holding Settings")]
     public float verticalOffset = 0f;           // 물체의 수직 위치 조정을 위한 오프셋
 
+    [Header("Scaling Settings")]
+    private float maxScaleFactor = 15f;           // 최대 크기 배율
 
 
     void Start()
@@ -242,9 +245,17 @@ public class PlayerController : MonoBehaviour
     {
         if (heldObject == null) return;
 
-        float distance = Vector3.Distance(playerCamera.transform.position, heldObject.transform.position);
-        float scaleFactor = distance / originalDistance;
+        // 현재 거리 계산
+        float currentDistance = Vector3.Distance(playerCamera.transform.position, heldObject.transform.position);
 
+        // 새로운 거리 계산 (제한 적용)
+        float newDistance = Mathf.Clamp(currentDistance, minDistance, maxDistance);
+
+        // 크기 조절 계수 계산
+        float scaleFactor = newDistance / originalDistance;
+        scaleFactor = Mathf.Clamp(scaleFactor, 1f, maxScaleFactor);
+
+        // 목표 크기 계산
         targetScale = originalScale * scaleFactor;
 
         // 각 축별로 최소/최대 크기 제한 적용
@@ -262,27 +273,13 @@ public class PlayerController : MonoBehaviour
         // 부드러운 크기 변경 적용
         heldObject.transform.localScale = Vector3.Lerp(heldObject.transform.localScale, targetScale, smoothSpeed * Time.deltaTime);
 
-        // 새로운 위치 계산 (최소 거리 고려)
-        float newDistance = Mathf.Max(distance, minDistance);
-
-        // 화면 중앙의 월드 좌표 계산
-        Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, newDistance);
-        Vector3 worldCenter = playerCamera.ScreenToWorldPoint(screenCenter);
-
-        // 물체의 새로운 위치 계산 (높이만 화면 중앙으로)
-        targetPosition = new Vector3(
-            heldObject.transform.position.x,
-            worldCenter.y + verticalOffset,
-            heldObject.transform.position.z
-        );
-
-        // 물체가 항상 카메라 앞에 있도록 조정
+        // 새로운 위치 계산
         Vector3 cameraForward = playerCamera.transform.forward;
-        cameraForward.y = 0; // y 축 회전 무시
-        targetPosition = playerCamera.transform.position + cameraForward.normalized * newDistance;
+        targetPosition = playerCamera.transform.position + cameraForward * newDistance;
 
         // 높이 조정
-        targetPosition.y = worldCenter.y + verticalOffset;
+        float verticalAdjustment = (heldObject.transform.localScale.y - originalScale.y) / 2f;
+        targetPosition.y += verticalOffset + verticalAdjustment;
 
         // 물체의 중심이 타겟 위치에 오도록 조정
         targetPosition += objectOffset;

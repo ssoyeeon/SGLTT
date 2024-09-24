@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Chacksi/GameScene/StartScene.unity
+    guid: 2899cfe748089ed4e8968629f01b30dd
+  - enabled: 1
     path: Assets/Scenes/Chacksi/GameScene/Stage1.unity
     guid: d8ad3b20b65b12e44a809759087baff5
   - enabled: 1
