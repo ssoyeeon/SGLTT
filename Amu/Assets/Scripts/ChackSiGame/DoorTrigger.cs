@@ -6,60 +6,42 @@ public class DoorTrigger : MonoBehaviour
 {
     public Collider doorCollider;
     public GameObject doorKey;
+    public float exitDistanceThreshold = 5.0f; // 나갈 때의 거리 임계값
+    private GameObject objectInTrigger = null; // 트리거 안에 있는 물체 추적
 
-    public bool isStay = false;
-
-    //public void OnCollisionEnter(Collision collision)
-    //{
-    //    if (doorKey)
-    //    {
-    //        doorCollider.enabled = false;
-    //    }
-    //}
-
-    public void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (doorKey)
-       {
-           doorCollider.enabled = false;
-            Debug.Log(other.gameObject.name + "타다");
+        {
+            doorCollider.enabled = false;
+            objectInTrigger = other.gameObject;
+            Debug.Log(other.gameObject.name + " 트리거 진입");
         }
     }
-    public void OnTriggerExit(Collider other)
+
+    void OnTriggerExit(Collider other)
     {
         if (doorKey)
         {
             doorCollider.enabled = true;
-            Debug.Log(other.gameObject.name + "짜잔");
+            objectInTrigger = null;
+            Debug.Log(other.gameObject.name + " 트리거 이탈");
         }
     }
-    //public void OnCollisionEnter(Collision collision)
-    //{
-    //    if (doorKey)
-    //   {
-    //       doorCollider.enabled = false;
-    //        Debug.Log(collision.gameObject.name + "타다");
-    //    }
-    //}
 
-    //public void OnCollisionExit(Collision collision)
-    //{
-    //    if (doorKey)
-    //    {
-    //        doorCollider.enabled = true;
-    //        Debug.Log(collision.gameObject.name + "짜잔");
-    //    }
-    //}
+    void Update()
+    {
+        if (objectInTrigger != null)
+        {
+            float distance = Vector3.Distance(transform.position, objectInTrigger.transform.position);
 
-    //void Update()
-    //{
-    //    if (doorKey && isStay == true)
-    //    {
-    //        doorCollider.enabled = false;
-    //    }
-    //    if (doorKey && isStay == false)
-    //    {
-    //        doorCollider.GetComponent<Collider>().enabled = true;
-    //    }
-    //}
+            if (distance > exitDistanceThreshold)
+            {
+                // 트리거에서 나간 것으로 처리
+                doorCollider.enabled = true;
+                objectInTrigger = null;
+                Debug.Log("트리거 이탈");
+            }
+        }
+    }
 }

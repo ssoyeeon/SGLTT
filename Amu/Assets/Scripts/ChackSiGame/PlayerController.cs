@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     public float maxSize = 10f;                 // 물체의 최대 크기
 
     [Header("Distance Settings")]
-    public float minDistance = 1f;              // 플레이어와 물체 사이의 최소 거리
+    private float minDistance = 4f;              // 플레이어와 물체 사이의 최소 거리
     private float maxDistance = 25f;              // 플레이어와 물체 사이의 최대 거리
 
     [Header("Smoothing Settings")]
