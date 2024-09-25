@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Chacksi/GameScene/Stage4.unity
     guid: 2a410d72d84eb9340a427cdc5ff90891
+  - enabled: 1
+    path: Assets/Scenes/Chacksi/GameScene/Stage5.unity
+    guid: baba716b2d0bcca42bf4a7fa3633409b
   m_configObjects: {}
