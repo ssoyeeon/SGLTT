@@ -2073,6 +2073,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doorCollider: {fileID: 1159299917}
   doorKey: {fileID: 1944690324}
+  exitDistanceThreshold: 1
 --- !u!65 &1522753270
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2088,7 +2089,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -2230,7 +2231,6 @@ MonoBehaviour:
   placeOffset: 0.1
   minSize: 0.01
   maxSize: 1.5
-  minDistance: 6
   smoothSpeed: 10
   positionPrecision: 0.001
   scalePrecision: 0.0001
