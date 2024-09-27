@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731704, g: 0.13414727, b: 0.121078536, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1339,19 +1339,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 554981191258748690, guid: 9aabbe93953cc404087d93637479ac0c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 978197338}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9aabbe93953cc404087d93637479ac0c, type: 3}
 --- !u!4 &978197335 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 934603435195526568, guid: 9aabbe93953cc404087d93637479ac0c, type: 3}
-  m_PrefabInstance: {fileID: 978197334}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &978197336 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 554981191258748690, guid: 9aabbe93953cc404087d93637479ac0c, type: 3}
   m_PrefabInstance: {fileID: 978197334}
   m_PrefabAsset: {fileID: 0}
 --- !u!65 &978197337 stripped
@@ -1359,21 +1351,6 @@ BoxCollider:
   m_CorrespondingSourceObject: {fileID: 1484783433159387714, guid: 9aabbe93953cc404087d93637479ac0c, type: 3}
   m_PrefabInstance: {fileID: 978197334}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &978197338
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 978197336}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a2d8ff7180f59b4baba4aef73dc9c51, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  doorCollider: {fileID: 978197337}
-  doorKey: {fileID: 501214454}
-  exitDistanceThreshold: 5
 --- !u!1 &985401312
 GameObject:
   m_ObjectHideFlags: 0
@@ -1793,12 +1770,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1189505441}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a2d8ff7180f59b4baba4aef73dc9c51, type: 3}
+  m_Script: {fileID: 11500000, guid: 8aeead9395fe15b43a73e5b574e0fd8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   doorCollider: {fileID: 978197337}
   doorKey: {fileID: 501214454}
-  exitDistanceThreshold: 1
 --- !u!1 &1233916454
 GameObject:
   m_ObjectHideFlags: 0
@@ -2190,7 +2166,7 @@ Transform:
   m_GameObject: {fileID: 1458037759}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 23.2, y: 2.7630424, z: 31.49}
+  m_LocalPosition: {x: -18, y: 2.7630424, z: 31.49}
   m_LocalScale: {x: 1.8498706, y: 11.597763, z: 18.824581}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3258,7 +3234,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 934603435195526568, guid: 9aabbe93953cc404087d93637479ac0c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 48.620453
+      value: 11.24
       objectReference: {fileID: 0}
     - target: {fileID: 934603435195526568, guid: 9aabbe93953cc404087d93637479ac0c, type: 3}
       propertyPath: m_LocalPosition.y
