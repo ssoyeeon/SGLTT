@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour
             AdjustObjectScale(); // 물체 크기 조정
             CheckCollisionWithWall(); // 벽 충돌 검사
             CheckProximityToFloor();  // 바닥과의 거리 검사
-
+            CheckCollisionWithCeiling();  // 천장과의 충돌 검사
             HandleObjectRotation();  // 물체 회전 처리
         }
     }
@@ -185,6 +185,25 @@ public class PlayerController : MonoBehaviour
             isHoldingObject = true;
         }
     }
+
+    void CheckCollisionWithCeiling()
+    {
+        if (selectedObject != null)
+        {
+            // SphereCast로 천장과의 충돌을 체크
+            float objectRadius = Mathf.Max(selectedObject.transform.localScale.x, selectedObject.transform.localScale.y, selectedObject.transform.localScale.z) / 2f;
+            RaycastHit hit;
+
+            // 캐릭터가 물체를 위로 이동시킬 때 천장과 충돌을 체크
+            if (Physics.SphereCast(playerCamera.transform.position, objectRadius, Vector3.up, out hit, holdDistance, wallLayer))  // wallLayer를 천장과 동일하게 사용 가능
+            {
+                // 천장과 충돌이 감지되면 물체를 자동으로 내려놓는다
+                Debug.Log("천장과 충돌! 물체를 내려놓습니다.");
+                DropObject();  // 천장과 충돌 시 물체를 내려놓기
+            }
+        }
+    }
+
 
 
     void HoldObject()
