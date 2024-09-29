@@ -447,7 +447,7 @@ Transform:
   m_GameObject: {fileID: 616238935}
   serializedVersion: 2
   m_LocalRotation: {x: 0.043479767, y: -0.018553378, z: 0.0008255229, w: 0.9988817}
-  m_LocalPosition: {x: 0.74, y: 1.1, z: 0.12}
+  m_LocalPosition: {x: -0, y: 0.91, z: 0.08}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -465,7 +465,7 @@ GameObject:
   - component: {fileID: 985401315}
   - component: {fileID: 985401314}
   - component: {fileID: 985401313}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1144,31 +1144,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fb8f61a57c1c274aac20b0aec382ae4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  mouseSensitivity: 2
-  jumpForce: 5
+  playerCamera: {fileID: 616238937}
+  speed: 5
+  mouseSensitivity: 100
   gravity: -9.81
-  pickupRange: 20
-  pickupLayer:
+  jumpHeight: 2
+  interactionDistance: 10
+  interactableLayer:
     serializedVersion: 2
     m_Bits: 128
   wallLayer:
     serializedVersion: 2
     m_Bits: 256
-  placeOffset: 0.1
-  minSize: 0.01
-  maxSize: 1.5
-  smoothSpeed: 10
-  positionPrecision: 0.001
-  scalePrecision: 0.0001
-  pickupCursorColor: {r: 0, g: 1, b: 0, a: 1}
-  defaultCrosshair: {fileID: 10912, guid: 0000000000000000f000000000000000, type: 0}
-  pickupCrosshair: {fileID: 10912, guid: 0000000000000000f000000000000000, type: 0}
-  crosshairColor: {r: 1, g: 1, b: 1, a: 1}
-  crosshairSize: 32
+  floorLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  minHoldDistance: 2
+  maxHoldDistance: 10
+  floorCheckDistance: 0.5
+  shrinkScaleFactor: 0.1
+  floorBuffer: 0.1
   rotationSpeed: 100
-  rotationAxis: {x: 0, y: 1, z: 0}
-  verticalOffset: 0
+  cursorImage: {fileID: 10912, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!1 &1636173637
 GameObject:
   m_ObjectHideFlags: 0

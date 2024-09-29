@@ -2,345 +2,273 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    //잡기 전엔 rig false 시켜놓기
-    [Header("Movement Settings")]
-    public float moveSpeed = 5f;                // 플레이어의 이동 속도
-    public float mouseSensitivity = 2f;         // 마우스 감도 (시점 회전 속도)
-    public float jumpForce = 1.5f;              // 점프할 때 적용되는 힘
-    public float gravity = -12f;              // 중력 가속도 값
+    public Camera playerCamera;
+    public float speed = 5f;
+    public float mouseSensitivity = 100f;
+    public float gravity = -9.81f;
+    public float jumpHeight = 2f;
+    public float interactionDistance = 10f;
+    public LayerMask interactableLayer; // 상호작용 가능한 레이어 마스크
+    public LayerMask wallLayer; // 벽 레이어 마스크
+    public LayerMask floorLayer; // 바닥 레이어 마스크
+    public float minHoldDistance = 2f; // 물체를 들고 있을 때 최소 거리
+    public float maxHoldDistance = 10f; // 물체를 들고 있을 때 최대 거리
+    public float floorCheckDistance = 0.5f; // 바닥과의 충돌을 체크할 거리
+    public float shrinkScaleFactor = 0.25f; // 바닥과 가까워지면 크기를 줄이는 비율
+    public float floorBuffer = 0.1f; // 바닥과 겹치지 않도록 하는 여유 공간
 
-    [Header("Interaction Settings")]
-    public float pickupRange = 10f;             // 물체를 집을 수 있는 최대 거리
-    public LayerMask pickupLayer;               // 집을 수 있는 물체가 속한 레이어
-    public LayerMask wallLayer;                 // 벽이 속한 레이어
-    public float placeOffset = 0.1f;            // 물체를 놓을 때 벽으로부터의 거리
+    private float holdDistance = 3f; // 현재 물체와 플레이어 사이의 거리 (동적으로 변화)
+    private bool isHoldingObject = false; // 물체를 들고 있는지 여부
 
-    [Header("Size Limits")]
-    public float minSize = 0.1f;                // 물체의 최소 크기
-    public float maxSize = 10f;                 // 물체의 최대 크기
+    private CharacterController controller;
+    private float pitch = 0f;
+    private Vector3 velocity;
+    private GameObject selectedObject;
+    private Rigidbody selectedObjectRb;
+    private Vector3 initialScale;
+    private float initialDistance;
 
-    [Header("Distance Settings")]
-    private float minDistance = 4f;              // 플레이어와 물체 사이의 최소 거리
-    private float maxDistance = 25f;              // 플레이어와 물체 사이의 최대 거리
+    public float rotationSpeed = 100f;  // 물체 회전 속도
 
-    [Header("Smoothing Settings")]
-    public float smoothSpeed = 10f;             // 물체 이동 및 크기 변경의 부드러움 정도
-    public float positionPrecision = 0.001f;    // 위치 조정의 정밀도
-    public float scalePrecision = 0.0001f;      // 크기 조정의 정밀도
-
-    [Header("UI Settings")]
-    public Color pickupCursorColor = Color.green;   // 물체를 집을 수 있을 때의 커서 색상  
-    public Texture2D defaultCrosshair;          // 기본 크로스헤어 텍스처
-    public Texture2D pickupCrosshair;           // 물체를 집을 수 있을 때의 크로스헤어 텍스처
-    public Color crosshairColor = Color.white;  // 크로스헤어 색상
-    public float crosshairSize = 32f;           // 크로스헤어 크기
-
-    // Private variables
-    private CharacterController controller;     // 플레이어의 CharacterController 컴포넌트
-    private Camera playerCamera;                // 플레이어 카메라
-    private float verticalRotation = 0f;        // 수직 회전 각도
-    private Vector3 velocity;                   // 플레이어의 현재 속도
-    private bool isGrounded;                    // 플레이어가 땅에 닿아 있는지 여부
-
-    private GameObject heldObject;              // 현재 들고 있는 물체
-    private Vector3 originalScale;              // 들고 있는 물체의 원래 크기
-    private float originalDistance;             // 물체를 집었을 때의 원래 거리
-    private Rigidbody heldRigidbody;            // 들고 있는 물체의 Rigidbody 컴포넌트
-    private Collider heldCollider;              // 들고 있는 물체의 Collider 컴포넌트
-
-    private Vector3 targetPosition;             // 물체의 목표 위치
-    private Vector3 targetScale;                // 물체의 목표 크기
-
-    private Quaternion originalRotation;        // 들고 있는 물체의 원래 회전
-   
-    [Header("Rotation Settings")]
-    public float rotationSpeed = 100f;          // 물체 회전 속도
-    public Vector3 rotationAxis = Vector3.up;   // 회전 축 (기본값: Y축)
-
-    private Quaternion objectRotation;          // 물체의 현재 회전 상태
-    private bool isRotating = false;            // 회전 중인지 여부
-
-    private bool canPickup = false;             // 물체를 집을 수 있는지 여부
-
-    private Vector3 objectOffset;               // 물체 중심과 피봇 포인트 사이의 오프셋
-
-    [Header("Object Holding Settings")]
-    public float verticalOffset = 0f;           // 물체의 수직 위치 조정을 위한 오프셋
-
-    [Header("Scaling Settings")]
-    private float maxScaleFactor = 15f;           // 최대 크기 배율
-
+    // 커서 이미지
+    public Texture2D cursorImage; // 사용할 커서 이미지
+    private Vector2 cursorSize = new Vector2(32, 32); // 커서 이미지 크기
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        playerCamera = GetComponentInChildren<Camera>();
-        objectRotation = Quaternion.identity;
-
-        // 커서 잠금
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.visible = false; // 기본 커서 숨기기
     }
 
     void Update()
     {
         HandleMovement();
-        HandleMouseLook();
-        HandleObjectInteraction();
-        CheckPickupRange();
-    }
+        HandleLook();
+        HandleInteraction();
 
-    void CheckPickupRange()
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, pickupRange, pickupLayer))
+        if (isHoldingObject)
         {
-            canPickup = true;
-        }
-        else
-        {
-            canPickup = false;
+            AdjustObjectScale(); // 물체 크기 조정
+            CheckCollisionWithWall(); // 벽 충돌 검사
+            CheckProximityToFloor();  // 바닥과의 거리 검사
+
+            HandleObjectRotation();  // 물체 회전 처리
         }
     }
 
     void OnGUI()
     {
-        // 화면 중앙 좌표 계산
-        float centerX = Screen.width / 2;
-        float centerY = Screen.height / 2;
-
-        // 크로스헤어 위치 및 크기 계산
-        Rect crosshairRect = new Rect(centerX - crosshairSize / 2, centerY - crosshairSize / 2, crosshairSize, crosshairSize);
-
-        // 크로스헤어 그리기
-        GUI.color = crosshairColor;
-        if (canPickup)
+        // 커서를 화면 중앙에 표시
+        if (cursorImage != null)
         {
-            GUI.DrawTexture(crosshairRect, pickupCrosshair);
-        }
-        else
-        {
-            GUI.DrawTexture(crosshairRect, defaultCrosshair);
+            // 화면 중앙 위치 계산
+            float centerX = (Screen.width - cursorSize.x) / 2;
+            float centerY = (Screen.height - cursorSize.y) / 2;
+
+            // 커서 이미지 그리기
+            GUI.DrawTexture(new Rect(centerX, centerY, cursorSize.x, cursorSize.y), cursorImage);
         }
     }
-
 
     void HandleMovement()
     {
-        isGrounded = controller.isGrounded;
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f;
-        }
-
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
-
         Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * moveSpeed * Time.deltaTime);
+        controller.Move(move * speed * Time.deltaTime);
 
-        // 점프 처리 이거 그냥 Rigbody에 주면 안되는걸까여..??
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (controller.isGrounded && velocity.y < 0)
         {
-            velocity.y = Mathf.Sqrt(jumpForce * -1f * gravity); 
+            velocity.y = -2f;  // Ensure the player stays on the ground.
         }
 
-        velocity.y += gravity * Time.deltaTime;
+        if (Input.GetButtonDown("Jump") && controller.isGrounded)
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);  // Jumping mechanics.
+        }
+
+        velocity.y += gravity * Time.deltaTime;  // Apply gravity.
         controller.Move(velocity * Time.deltaTime);
     }
 
-    void HandleMouseLook()
+    void HandleLook()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-        verticalRotation -= mouseY;
-        verticalRotation = Mathf.Clamp(verticalRotation, -90f, 90f);
+        pitch -= mouseY;
+        pitch = Mathf.Clamp(pitch, -90f, 90f);  // Limit the camera's vertical rotation.
+        playerCamera.transform.localEulerAngles = new Vector3(pitch, 0f, 0f);
+        transform.Rotate(Vector3.up * mouseX);  // Horizontal rotation.
 
-        playerCamera.transform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
-        transform.Rotate(Vector3.up * mouseX);
+        // 물체와의 거리를 카메라의 수직 회전에 따라 조정
+        AdjustHoldDistance(mouseY);
     }
 
-    void HandleObjectInteraction()
+    void AdjustHoldDistance(float mouseY)
     {
-        if (Input.GetMouseButtonDown(0))
+        if (selectedObject != null)
         {
-            if (heldObject == null)
-            PickupObject();       //..ㅠ 어떡하죠?
+            // 마우스 Y 축 이동에 따라 holdDistance 조정 (위로 가면 물체가 멀어지고 커짐, 아래로 가면 가까워짐)
+            holdDistance += mouseY * Time.deltaTime * 5f;  // 마우스 이동에 따라 거리 조정 속도 설정
+            holdDistance = Mathf.Clamp(holdDistance, minHoldDistance, maxHoldDistance);  // 최소/최대 거리 제한
+        }
+    }
 
+    void HandleInteraction()
+    {
+        if (Input.GetMouseButtonDown(0))  // When the player clicks the mouse.
+        {
+            if (selectedObject == null)
+            {
+                TrySelectObject();  // 물체를 선택해서 든다
+            }
             else
-            PlaceObject();
-        }
-
-        if (heldObject != null)
-        {
-            UpdateObjectSizeAndPosition();
-            RotateObject();
-        }
-    }
-
-    void PickupObject()
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, pickupRange, pickupLayer))
-        {
-            heldObject = hit.transform.gameObject;
-            originalScale = heldObject.transform.localScale;
-            originalDistance = hit.distance;
-            objectRotation = heldObject.transform.rotation;
-
-            // 물체의 중심점 계산
-            Bounds bounds = CalculateBounds(heldObject);
-            objectOffset = heldObject.transform.position - bounds.center;
-
-            heldRigidbody = heldObject.GetComponent<Rigidbody>();
-            heldCollider = heldObject.GetComponent<Collider>();
-
-            if (heldRigidbody != null)
             {
-                heldRigidbody.isKinematic = true;
-            }
-
-            if (heldCollider != null)
-            {
-                heldCollider.enabled = false;
+                DropObject();  // 물체를 놓는다
             }
         }
+
+        if (selectedObject != null)
+        {
+            HoldObject();  // 물체를 들고 있을 때 위치 고정
+        }
     }
 
-    void PlaceObject()
+    void TrySelectObject()
     {
-        if (heldObject == null) return;
-
-        Vector3 currentPosition = heldObject.transform.position;
-        Vector3 currentScale = heldObject.transform.localScale;
-
+        Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
         RaycastHit hit;
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, pickupRange, wallLayer))
+        if (Physics.Raycast(ray, out hit, interactionDistance, interactableLayer)) // 해당 레이어만 선택
         {
-            currentPosition = hit.point + hit.normal * (currentScale.magnitude * 0.5f);
+            selectedObject = hit.collider.gameObject;
+            selectedObjectRb = selectedObject.GetComponent<Rigidbody>();
+
+            if (selectedObjectRb != null)
+            {
+                selectedObjectRb.isKinematic = true;  // 물체를 든 상태에서는 물리 엔진 영향을 받지 않게 한다.
+            }
+
+            // 물체를 처음 집을 때 플레이어와 물체 사이의 거리를 기준으로 holdDistance 설정
+            holdDistance = Vector3.Distance(playerCamera.transform.position, selectedObject.transform.position);
+
+            // 물체 크기 관련 초기 값 저장
+            initialScale = selectedObject.transform.localScale;
+            initialDistance = holdDistance;
+
+            isHoldingObject = true;
         }
-
-        heldObject.transform.position = currentPosition;
-        heldObject.transform.rotation = objectRotation;  // 현재 회전 상태 유지
-
-        if (heldCollider != null)
-        {
-            heldCollider.enabled = true;
-        }
-
-        if (heldRigidbody != null)
-        {
-            heldRigidbody.isKinematic = false;
-            heldRigidbody.velocity = Vector3.zero;
-            heldRigidbody.angularVelocity = Vector3.zero;
-        }
-
-        heldObject = null;
-        heldRigidbody = null;
-        heldCollider = null;
     }
 
-    void UpdateObjectSizeAndPosition()
+    void HoldObject()
     {
-        if (heldObject == null) return;
-
-        // 현재 거리 계산
-        float currentDistance = Vector3.Distance(playerCamera.transform.position, heldObject.transform.position);
-
-        // 새로운 거리 계산 (제한 적용)
-        float newDistance = Mathf.Clamp(currentDistance, minDistance, maxDistance);
-
-        // 크기 조절 계수 계산
-        float scaleFactor = newDistance / originalDistance;
-        scaleFactor = Mathf.Clamp(scaleFactor, 1f, maxScaleFactor);
-
-        // 목표 크기 계산
-        targetScale = originalScale * scaleFactor;
-
-        // 각 축별로 최소/최대 크기 제한 적용
-        targetScale.x = Mathf.Clamp(targetScale.x, minSize, maxSize);
-        targetScale.y = Mathf.Clamp(targetScale.y, minSize, maxSize);
-        targetScale.z = Mathf.Clamp(targetScale.z, minSize, maxSize);
-
-        // 크기 정밀도 적용
-        targetScale = new Vector3(
-            Mathf.Round(targetScale.x / scalePrecision) * scalePrecision,
-            Mathf.Round(targetScale.y / scalePrecision) * scalePrecision,
-            Mathf.Round(targetScale.z / scalePrecision) * scalePrecision
-        );
-
-        // 부드러운 크기 변경 적용
-        heldObject.transform.localScale = Vector3.Lerp(heldObject.transform.localScale, targetScale, smoothSpeed * Time.deltaTime);
-
-        // 새로운 위치 계산
-        Vector3 cameraForward = playerCamera.transform.forward;
-        targetPosition = playerCamera.transform.position + cameraForward * newDistance;
-
-        // 높이 조정
-        float verticalAdjustment = (heldObject.transform.localScale.y - originalScale.y) / 2f;
-        targetPosition.y += verticalOffset + verticalAdjustment;
-
-        // 물체의 중심이 타겟 위치에 오도록 조정
-        targetPosition += objectOffset;
-
-        // 벽 충돌 검사
-        targetPosition = AdjustPositionForWalls(targetPosition, targetScale);
-
-        // 위치 정밀도 적용
-        targetPosition = new Vector3(
-            Mathf.Round(targetPosition.x / positionPrecision) * positionPrecision,
-            Mathf.Round(targetPosition.y / positionPrecision) * positionPrecision,
-            Mathf.Round(targetPosition.z / positionPrecision) * positionPrecision
-        );
-
-        // 부드러운 위치 변경 적용
-        heldObject.transform.position = Vector3.Lerp(heldObject.transform.position, targetPosition, smoothSpeed * Time.deltaTime);
-
-        // 물체의 회전 상태 적용
-        heldObject.transform.rotation = objectRotation;
+        if (selectedObject != null)
+        {
+            // 물체가 카메라 앞 고정된 거리에 있도록 설정 (holdDistance 값에 따라 위치 조정)
+            selectedObject.transform.position = playerCamera.transform.position + playerCamera.transform.forward * holdDistance;
+        }
     }
 
-    Bounds CalculateBounds(GameObject obj)
+    void AdjustObjectScale()
     {
-        Bounds bounds = new Bounds(obj.transform.position, Vector3.zero);
-        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
-        foreach (Renderer renderer in renderers)
+        if (selectedObject != null)
         {
-            bounds.Encapsulate(renderer.bounds);
+            // 현재 거리 계산
+            float currentDistance = Vector3.Distance(playerCamera.transform.position, selectedObject.transform.position);
+            float scaleFactor = currentDistance / initialDistance;  // 물체가 멀어질수록 커지고 가까워질수록 작아짐
+
+            // 목표 크기 계산
+            Vector3 targetScale = initialScale * scaleFactor;
+
+            // 최소 크기 0.1로 설정
+            targetScale = Vector3.Max(targetScale, new Vector3(0.1f, 0.1f, 0.1f));
+
+            // 물체의 스케일을 부드럽게 조정
+            selectedObject.transform.localScale = Vector3.Lerp(selectedObject.transform.localScale, targetScale, Time.deltaTime * 5f);
         }
-        return bounds;
     }
 
-    Vector3 AdjustPositionForWalls(Vector3 desiredPosition, Vector3 objectScale)
+
+    void DropObject()
     {
-        float radius = Mathf.Max(objectScale.x, objectScale.y, objectScale.z) / 2;
-        RaycastHit hit;
-        if (Physics.SphereCast(playerCamera.transform.position, radius, playerCamera.transform.forward, out hit, pickupRange, wallLayer))
+        if (selectedObjectRb != null)
         {
-            return hit.point + hit.normal * (radius + placeOffset);
+            selectedObjectRb.isKinematic = false;  // 다시 물리 엔진의 영향을 받게 한다.
         }
-        return desiredPosition;
+
+        selectedObject = null;  // 선택한 물체를 해제
+        selectedObjectRb = null;
+        isHoldingObject = false;  // 물체를 들고 있지 않은 상태로 변경
     }
 
-    void RotateObject()
+    // 벽에 충돌하면 물체를 플레이어 쪽으로 당기면서 크기를 줄임
+    void CheckCollisionWithWall()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (selectedObject != null)
         {
-            isRotating = true;
-        }
-        else if (Input.GetKeyUp(KeyCode.R))
-        {
-            isRotating = false;
-        }
+            // SphereCast로 벽과의 충돌을 체크
+            float objectRadius = Mathf.Max(selectedObject.transform.localScale.x, selectedObject.transform.localScale.y, selectedObject.transform.localScale.z) / 2f;
+            RaycastHit hit;
 
-        if (isRotating)
-        {
-            // R 키를 누르고 있는 동안 물체를 현재 위치에서 자전
-            float rotationAmount = rotationSpeed * Time.deltaTime;
-            objectRotation *= Quaternion.AngleAxis(rotationAmount, rotationAxis);
+            // 캐릭터가 물체를 앞으로 이동시킬 때 벽과 충돌을 체크
+            if (Physics.SphereCast(playerCamera.transform.position, objectRadius, playerCamera.transform.forward, out hit, holdDistance, wallLayer))
+            {
+                // 벽과 충돌이 감지되면 물체를 자동으로 내려놓는다
+                Debug.Log("벽과 충돌! 물체를 내려놓습니다.");
+                DropObject();  // 벽과 충돌 시 물체를 내려놓기
+            }
         }
     }
+
+    // R 키를 누르고 있을 때 물체 회전 처리
+    void HandleObjectRotation()
+    {
+        if (Input.GetKey(KeyCode.R) && selectedObject != null)
+        {
+            // 물체를 회전시킴 (Y축을 기준으로 회전)
+            selectedObject.transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
+        }
+    }
+
+    // 바닥과 가까워지면 크기 조정 및 통과 방지
+    void CheckProximityToFloor()
+    {
+        if (selectedObject != null)
+        {
+            RaycastHit hit;
+            // 아래쪽으로 Raycast를 쏴서 바닥과의 거리를 계산
+            if (Physics.Raycast(selectedObject.transform.position, Vector3.down, out hit, floorCheckDistance, floorLayer))
+            {
+                // 물체가 바닥에 너무 가까워지면 물체를 자동으로 내려놓음
+                if (hit.distance < floorBuffer)
+                {
+                    Debug.Log("바닥에 닿았으므로 물체를 내려놓습니다.");
+                    DropObject();  // 물체를 자동으로 내려놓기
+                    return;  // 충돌 시 더 이상 진행하지 않도록 종료
+                }
+
+                // 카메라가 바닥을 향하고 있을 때만 크기 조정
+                Vector3 cameraForward = playerCamera.transform.forward;
+                Vector3 floorNormal = hit.normal;
+
+                // 카메라가 바닥을 향할 때
+                if (Vector3.Dot(cameraForward, floorNormal) < 0)
+                {
+                    // 바닥에 가까워질수록 물체 크기를 줄임
+                    float distanceToFloor = hit.distance;
+                    float targetScaleFactor = 1f - (1f - shrinkScaleFactor) * (1f - (distanceToFloor / floorCheckDistance));
+
+                    // 목표 크기 계산
+                    Vector3 targetScale = initialScale * Mathf.Clamp(targetScaleFactor, 0.1f, 1f); // 최소 크기 0.1로 설정
+
+                    // 물체의 스케일을 부드럽게 조정
+                    selectedObject.transform.localScale = Vector3.Lerp(selectedObject.transform.localScale, targetScale, Time.deltaTime * 5f);
+                }
+            }
+        }
+    }
+
 
 
 }
