@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
     private float initialDistance;
 
     public float rotationSpeed = 100f;  // 물체 회전 속도
+    private bool isGrounded;                  
 
     // 커서 이미지
     public Texture2D cursorImage; // 사용할 커서 이미지
@@ -73,22 +74,25 @@ public class PlayerController : MonoBehaviour
 
     void HandleMovement()
     {
+        isGrounded = controller.isGrounded;
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f;
+        }
+
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
+
         Vector3 move = transform.right * x + transform.forward * z;
         controller.Move(move * speed * Time.deltaTime);
 
-        if (controller.isGrounded && velocity.y < 0)
+       
+        if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            velocity.y = -2f;  // Ensure the player stays on the ground.
+            velocity.y = Mathf.Sqrt(jumpHeight * -1f * gravity);
         }
 
-        if (Input.GetButtonDown("Jump") && controller.isGrounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);  // Jumping mechanics.
-        }
-
-        velocity.y += gravity * Time.deltaTime;  // Apply gravity.
+        velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
     }
 
@@ -138,6 +142,27 @@ public class PlayerController : MonoBehaviour
 
     void TrySelectObject()
     {
+        // 플레이어의 Y축 각도 확인 (카메라 각도 기준)
+        float playerAngleY = playerCamera.transform.eulerAngles.x;
+        if (playerAngleY > 45f && playerAngleY < 315f)  // Y축 각도가 45도 이상인 경우
+        {
+            Debug.Log("플레이어의 Y 각도가 45도 이상이므로 물체를 집을 수 없습니다.");
+            return;
+        }
+
+        // 플레이어 아래로 Raycast를 쏴서 물체 위에 있는지 확인
+        RaycastHit downHit;
+        if (Physics.Raycast(transform.position, Vector3.down, out downHit, floorCheckDistance))
+        {
+            GameObject groundObject = downHit.collider.gameObject;
+            if (groundObject.CompareTag("Interactable"))  // 플레이어가 물체 위에 있는 경우
+            {
+                Debug.Log("물체 위에 있어서 집을 수 없습니다.");
+                return;
+            }
+        }
+
+        // 화면 중앙으로 Raycast 쏴서 물체 선택 시도
         Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, interactionDistance, interactableLayer)) // 해당 레이어만 선택
@@ -160,6 +185,7 @@ public class PlayerController : MonoBehaviour
             isHoldingObject = true;
         }
     }
+
 
     void HoldObject()
     {
