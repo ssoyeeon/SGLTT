@@ -7,7 +7,7 @@ public class Door : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if (tag == "Player")
+        if (other.gameObject.tag == "Player")
         {
             Scene scene = SceneManager.GetActiveScene();
             int curScene = scene.buildIndex;
