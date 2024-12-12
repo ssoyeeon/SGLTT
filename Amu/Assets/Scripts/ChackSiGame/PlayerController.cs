@@ -151,7 +151,7 @@ public class PlayerController : MonoBehaviour
     {
         // 플레이어의 Y축 각도 확인 (카메라 각도 기준)
         float playerAngleY = playerCamera.transform.eulerAngles.x;
-        if (playerAngleY > 45f && playerAngleY < 315f)  // Y축 각도가 45도 이상인 경우
+        if (playerAngleY > 70f && playerAngleY < 315f)  // Y축 각도가 45도 이상인 경우
         {
             Debug.Log("플레이어의 Y 각도가 45도 이상이므로 물체를 집을 수 없습니다.");
             return;

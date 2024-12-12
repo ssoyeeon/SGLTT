@@ -7,6 +7,6 @@ public class Clear : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        SceneManager.LoadScene("StartScene");
+        SceneManager.LoadScene("EndScene");
     }
 }
