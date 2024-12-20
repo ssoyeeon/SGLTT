@@ -9,6 +9,7 @@ TagManager:
   - Unreal
   - DoorTrigger
   - Pickable
+  - Wall
   layers:
   - Default
   - TransparentFX
