@@ -4,6 +4,38 @@ using UnityEngine;
 
 public class HaHa : MonoBehaviour
 {
+    private readonly Vector3[] faceDirections = new Vector3[6]
+    {
+        Vector3.up,    // 6
+        Vector3.down,  // 1
+        Vector3.right, // 2
+        Vector3.left,  // 5
+        Vector3.forward,  // 4
+        Vector3.back   // 3
+    };
+
+    private readonly int[] faceNumbers = new int[6] { 6, 1, 2, 5, 4, 3 };
+
+    void Update()
+    {
+        float maxDot = -1f;
+        int faceIndex = 0;
+
+        for (int i = 0; i < 6; i++)
+        {
+            float dot = Vector3.Dot(transform.up, faceDirections[i]);
+            if (dot > maxDot)
+            {
+                maxDot = dot;
+                faceIndex = i;
+            }
+        }
+
+        if (maxDot >= 0.9f)
+        {
+            Debug.Log($"¡÷ªÁ¿ß ¿≠∏È: {faceNumbers[faceIndex]}");
+        }
+    }
     void Start()
     {
         float udot = Vector3.Dot(transform.up, Vector3.up);
@@ -34,11 +66,5 @@ public class HaHa : MonoBehaviour
         {
             Debug.Log("5");
         }
-
-    }
-
-    void Update()
-    {
-        
     }
 }
